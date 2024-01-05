@@ -16,6 +16,11 @@ go build -o systemctl-add
 sudo ./systemctl-add freeswitch '/usr/local/freeswitch/bin/freeswitch -ncwait -nonat'
 ```
 
+## TODO
+
++ [ ] ssh
++ [ ] release
+
 ## ref
 
 
