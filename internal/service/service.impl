@@ -1,0 +1,18 @@
+[Unit]
+Description={{Description}}
+After=network.target
+
+[Service]
+PermissionsStartOnly=true
+Type=forking
+ExecStart={{ExecStart}}
+ExecStartPost=
+ExecStopPost=
+
+{% if WorkingDirectory == null || WorkingDirectory == '' %}; {% else %}{% endif %}WorkingDirectory={{WorkingDirectory}}
+{% if User == null || User == '' %}; {% else %}{% endif %}User={{User}}
+{% if Group == null || Group == '' %}; {% else %}{% endif %}Group={{Group}}
+{% if UMask == null || UMask == '' %}; {% else %}{% endif %}UMask={{UMask}}
+
+[Install]
+WantedBy=multi-user.target

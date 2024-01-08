@@ -3,33 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"text/template"
+
+	"github.com/azhao1981/systemctl-add/internal/service"
+	"github.com/azhao1981/systemctl-add/pkg/cfg"
+	"github.com/spf13/viper"
 )
-
-const serviceTemplate = `[Unit]
-Description={{.Description}}
-After=network.target
-
-[Service]
-PermissionsStartOnly=true
-Type=forking
-ExecStart={{.ExecStart}}
-ExecStartPost=
-ExecStopPost=
-
-; WorkingDirectory=
-; User=
-; Group=
-; UMask=0022
-
-[Install]
-WantedBy=multi-user.target
-`
-
-type Service struct {
-	Description string
-	ExecStart   string
-}
 
 func main() {
 	if len(os.Args) != 3 {
@@ -39,17 +17,13 @@ func main() {
 
 	name := os.Args[1]
 	command := os.Args[2]
-	filename := "/etc/systemd/system/" + name + ".service"
+	viper.Set("service.description", name)
+	viper.Set("service.exec.start", command)
 
-	service := Service{
-		Description: name,
-		ExecStart:   command,
-	}
+	cfg.Init("")
+	serviceData := cfg.Cfg.Service
 
-	tmpl, err := template.New("service").Parse(serviceTemplate)
-	if err != nil {
-		panic(err)
-	}
+	filename := serviceData.Dir + name + ".service"
 
 	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
@@ -57,10 +31,11 @@ func main() {
 	}
 	defer file.Close()
 
-	err = tmpl.Execute(file, service)
+	fileBody, err := service.Execute(serviceData)
 	if err != nil {
 		panic(err)
 	}
+	file.WriteString(fileBody)
 
 	fmt.Printf("created %s\ntry:\nsudo systemctl daemon-reload\nsudo systemctl start %s\n\nsudo systemctl enable %s\n", filename, name, name)
 }

@@ -14,6 +14,8 @@ go build -o systemctl-add
 
 ```bash
 sudo ./systemctl-add freeswitch '/usr/local/freeswitch/bin/freeswitch -ncwait -nonat'
+
+SERVICE_DIR=./temp/ ./systemctl-add freeswitch '/usr/local/freeswitch/bin/freeswitch -ncwait -nonat'
 ```
 
 ## TODO
